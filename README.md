@@ -1,2 +1,3 @@
 # space_ziggurat
-My personal repository
+
+# About me
