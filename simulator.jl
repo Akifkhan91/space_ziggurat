@@ -1,4 +1,4 @@
-function simulator(initital_and_boundary_conditions,data,ord,thrust_vector,Δt)
+function simulator(initital_and_boundary_conditions,data,thrust_vector,Δt)
     x = zeros(Float64, data.T)
     y = zeros(Float64, data.T)
     z = zeros(Float64, data.T)
@@ -24,24 +24,25 @@ function simulator(initital_and_boundary_conditions,data,ord,thrust_vector,Δt)
     a_z = zeros(Float64, data.T-1)
     
     for t=2:data.T
-    v_x[t] = v_x[t-1] - scaled_mu_constant * Δt/ (x[t-1]^2 + y[t-1]^2 + z[t-1]^2)
-    v_y[t] = v_y[t-1]
-    v_z[t] = v_z[t-1]
+        a_x[t-1] =  -data.scaled_mu_const * 
+                    x[t-1]/(x[t-1]^2 + y[t-1]^2 + z[t-1]^2)^1.5 +  
+                     thrust_vector[t-1,1]/data.initial_mass
+        
+        a_y[t-1] = -data.scaled_mu_const * 
+                    y[t-1]/(x[t-1]^2 + y[t-1]^2 + z[t-1]^2)^1.5 +  
+                     thrust_vector[t-1,2]/data.initial_mass
+        
+        a_z[t-1] = -data.scaled_mu_const * 
+                    z[t-1]/(x[t-1]^2 + y[t-1]^2 + z[t-1]^2)^1.5 +  
+                     thrust_vector[t-1,3]/data.initial_mass
+        
+        v_x[t] = a_x[t-1]*Δt + v_x[t-1] 
+        v_y[t] = a_y[t-1]*Δt + v_y[t-1]
+        v_z[t] = a_z[t-1]*Δt + v_z[t-1]
 
-    x[t] = v_x[t] * Δt + x[t-1]
-    y[t] = v_y[t] * Δt + y[t-1]
-    z[t] = v_z[t] * Δt + z[t-1]
-
-    if t == 2
-        a_x[t-1] = (v_x[t] - v_x[t-1]) / Δt
-        a_y[t-1] = (v_y[t] - v_y[t-1]) / Δt
-        a_z[t-1] = (v_z[t] - v_z[t-1]) / Δt
-    else
-        a_x[t-1] = (x[t] - 2 * x[t-1] +  x[t-2]) / Δt^2
-        a_y[t-1] = (y[t] - 2 * y[t-1] +  y[t-2]) / Δt^2
-        a_z[t-1] = (z[t] - 2 * z[t-1] +  z[t-2]) / Δt^2
-    end
-    
-    end
+        x[t] = v_x[t] * Δt + x[t-1]
+        y[t] = v_y[t] * Δt + y[t-1]
+        z[t] = v_z[t] * Δt + z[t-1]
+        end
 
 end
